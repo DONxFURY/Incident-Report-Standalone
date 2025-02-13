@@ -3,55 +3,106 @@
 <html>
 <head>
     <title>Crime Report System</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h2>Crime Incident Report</h2>
-        <form id="reportForm">
+        <div class="header">
+            <img src="https://th.bing.com/th/id/OIP.X_IRyVmO_jAyPBDCfRv_sQHaJf?rs=1&pid=ImgDetMain/50x50" alt="Badge" class="badge-icon">
+            <h2>Law Enforcement Report System</h2>
+            <div class="header-gradient"></div>
+        </div>
+        
+        <form id="reportForm" class="form-animate">
             <div class="form-group">
-                <label for="title">Incident Title:</label>
-                <input type="text" id="title" required>
+                <label for="title">
+                    <i class="icon icon-title"></i>
+                    Incident Title
+                </label>
+                <input type="text" id="title" placeholder="Brief incident description" maxlength="60">
+                <div class="character-count" id="titleCount">0/60</div>
             </div>
+
             <div class="form-group">
-                <label for="location">Location:</label>
-                <input type="text" id="location" required>
+                <label for="location">
+                    <i class="icon icon-location"></i>
+                    Location
+                </label>
+                <input type="text" id="location" placeholder="Enter exact location or cross streets">
             </div>
+
             <div class="form-group">
-                <label for="description">Incident Details:</label>
-                <textarea id="description" rows="5" required></textarea>
+                <label for="description">
+                    <i class="icon icon-description"></i>
+                    Incident Details
+                </label>
+                <textarea id="description" rows="6" placeholder="Include full details, suspects, vehicles, and evidence" maxlength="1000"></textarea>
+                <div class="character-count" id="descCount">0/1000</div>
             </div>
+
             <div class="button-group">
-                <button type="button" class="cancel" onclick="closeForm()">Cancel</button>
-                <button type="submit">Submit Report</button>
+                <button type="button" class="cancel" onclick="closeForm()">
+                    <i class="icon icon-cancel"></i>
+                    Cancel
+                </button>
+                <button type="submit" class="submit-btn">
+                    <i class="icon icon-submit"></i>
+                    Submit Report
+                    <div class="loading-spinner"></div>
+                </button>
             </div>
         </form>
     </div>
+
     <script>
+        // Add real-time character counting
+        document.getElementById('title').addEventListener('input', updateCounters);
+        document.getElementById('description').addEventListener('input', updateCounters);
+
+        function updateCounters() {
+            document.getElementById('titleCount').textContent = 
+                `${document.getElementById('title').value.length}/60`;
+            document.getElementById('descCount').textContent = 
+                `${document.getElementById('description').value.length}/1000`;
+        }
+
         document.getElementById('reportForm').addEventListener('submit', (e) => {
             e.preventDefault();
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.classList.add('loading');
+            
             const data = {
                 title: document.getElementById('title').value,
                 location: document.getElementById('location').value,
                 description: document.getElementById('description').value
             };
+
+            if(!validateForm(data)) {
+                submitBtn.classList.remove('loading');
+                return;
+            }
+
             fetch(`https://crimeReports/submit`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json; charset=UTF-8',
-                },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
-            }).then(resp => resp.json()).then(resp => console.log(resp));
+            }).finally(() => {
+                submitBtn.classList.remove('loading');
+            });
         });
 
+        function validateForm(data) {
+            let isValid = true;
+            // Add validation logic here
+            return isValid;
+        }
+
         function closeForm() {
-            fetch(`https://crimeReports/close`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json; charset=UTF-8',
-                },
-                body: JSON.stringify({})
-            }).then(resp => resp.json()).then(resp => console.log(resp));
+            document.querySelector('.container').classList.add('close-animation');
+            setTimeout(() => {
+                fetch(`https://crimeReports/close`, {method: 'POST'});
+            }, 300);
         }
     </script>
 </body>
