@@ -1,0 +1,58 @@
+<!-- ui/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crime Report System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Crime Incident Report</h2>
+        <form id="reportForm">
+            <div class="form-group">
+                <label for="title">Incident Title:</label>
+                <input type="text" id="title" required>
+            </div>
+            <div class="form-group">
+                <label for="location">Location:</label>
+                <input type="text" id="location" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Incident Details:</label>
+                <textarea id="description" rows="5" required></textarea>
+            </div>
+            <div class="button-group">
+                <button type="button" class="cancel" onclick="closeForm()">Cancel</button>
+                <button type="submit">Submit Report</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        document.getElementById('reportForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const data = {
+                title: document.getElementById('title').value,
+                location: document.getElementById('location').value,
+                description: document.getElementById('description').value
+            };
+            fetch(`https://crimeReports/submit`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json; charset=UTF-8',
+                },
+                body: JSON.stringify(data)
+            }).then(resp => resp.json()).then(resp => console.log(resp));
+        });
+
+        function closeForm() {
+            fetch(`https://crimeReports/close`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json; charset=UTF-8',
+                },
+                body: JSON.stringify({})
+            }).then(resp => resp.json()).then(resp => console.log(resp));
+        }
+    </script>
+</body>
+</html>
